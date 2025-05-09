@@ -26,7 +26,17 @@ st.write("Upload an image to detect metal defects using a trained CNN model.")
 uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
-    image = load_img(uploaded_file, target_size=(256, 256))
+    image = load_img(uploaded_file, target_size=(256, 256), color_mode='rgb')  # Force RGB
+img_array = img_to_array(image) / 255.0
+
+if img_array.shape != (256, 256, 3):
+    st.error("Uploaded image is not in RGB format or has wrong size.")
+else:
+    img_array = np.expand_dims(img_array, axis=0)
+    prediction = model.predict(img_array)
+    predicted_class = class_names[np.argmax(prediction)]
+    st.markdown(f"### 🧠 Prediction: `{predicted_class}`")
+
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
     img_array = img_to_array(image) / 255.0

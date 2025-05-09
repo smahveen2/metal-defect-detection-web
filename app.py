@@ -4,7 +4,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
 # Load trained model
-model = load_model('final_model.keras')
+model = load_model('final_model.h5')
 
 # Replace these with your actual class names
 class_names = ['defect_1', 'defect_2', 'no_defect']

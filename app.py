@@ -5,7 +5,13 @@ from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
 # Load trained model
 model = load_model('final_model.h5')
+gdrive_url ="https://colab.research.google.com/drive/1j5kB08YQZkvcHZECgJjsMhu4zhzR5hvY?usp=sharing"
 
+# Download if not already present
+if not os.path.exists(model_path):
+    gdown.download(gdrive_url, model_path, quiet=False)
+
+model = load_model(model_path)
 # Replace these with your actual class names
 class_names = ['defect_1', 'defect_2', 'no_defect']
 

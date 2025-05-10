@@ -11,11 +11,17 @@ file_id = '1KdnDz466Mes5XtREb2SFTSFOdzxO_xq_'
 url = f'https://drive.google.com/uc?id={file_id}'
 model_path = 'final_model.h5'
 
+# STEP 1: Download the model with error handling
 if not os.path.exists(model_path):
-    gdown.download(url, model_path, quiet=False)
+    st.info("🔽 Downloading model from Google Drive...")
+    gdown.download(url, model_path, quiet=False, fuzzy=True)
 
-# STEP 2: Load the model
-model = load_model(model_path)
+# STEP 2: Verify the model file before loading
+if not os.path.exists(model_path) or os.path.getsize(model_path) < 1000:
+    st.error("❌ Model download failed or file is incomplete. Please check the Google Drive link or file ID.")
+    st.stop()
+else:
+    model = load_model(model_path)
 
 # STEP 3: Define class names
 class_names = ['defect_1', 'defect_2', 'no_defect']

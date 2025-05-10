@@ -2,64 +2,37 @@ import os
 import gdown
 import streamlit as st
 import numpy as np
-import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
 # STEP 1: Download the model from Google Drive if not already downloaded
-file_id = '1KdnDz466Mes5XtREb2SFTSFOdzxO_xq_'
+file_id = '1ulXy2N4-ofhXI9i5hd_TvF53WClJhzkf'
 url = f'https://drive.google.com/uc?id={file_id}'
 model_path = 'final_model.h5'
 
-# STEP 1: Download the model with error handling
 if not os.path.exists(model_path):
-    st.info("🔽 Downloading model from Google Drive...")
-    gdown.download(url, model_path, quiet=False, fuzzy=True)
+    gdown.download(url, model_path, quiet=False)
 
-# STEP 2: Verify the model file before loading
-if not os.path.exists(model_path) or os.path.getsize(model_path) < 1000:
-    st.error("❌ Model download failed or file is incomplete. Please check the Google Drive link or file ID.")
-    st.stop()
-else:
-    model = load_model(model_path)
+# STEP 2: Load the model
+model = load_model(model_path)
 
-# STEP 3: Define class names
+# STEP 3: Define class names (update with your actual defect classes)
 class_names = ['defect_1', 'defect_2', 'no_defect']
 
-# STEP 4: Streamlit UI
+# STEP 4: Build Streamlit interface
 st.title("🔍 Metal Defect Detection")
 st.write("Upload an image to detect metal defects using a trained CNN model.")
 
 uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
-    try:
-        image = load_img(uploaded_file, target_size=(256, 256), color_mode='rgb')
-        img_array = img_to_array(image) / 255.0
+    image = load_img(uploaded_file, target_size=(256, 256))
+    st.image(image, caption="Uploaded Image", use_column_width=True)
 
-        if img_array.shape != (256, 256, 3):
-            st.error("Uploaded image is not in RGB format or has the wrong size.")
-        else:
-            img_array = np.expand_dims(img_array, axis=0)  # Shape: (1, 256, 256, 3)
+    img_array = img_to_array(image) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
 
-            prediction = model.predict(img_array)
-            predicted_index = np.argmax(prediction)
-            predicted_class = class_names[predicted_index]
-            confidence = prediction[0][predicted_index] * 100
+    prediction = model.predict(img_array)
+    predicted_class = class_names[np.argmax(prediction)]
 
-            st.image(image, caption="Uploaded Image", use_column_width=True)
-            st.markdown(f"### 🧠 Prediction: `{predicted_class}`")
-            st.markdown(f"**Confidence:** `{confidence:.2f}%`")
-
-            # Bar chart of class probabilities
-            st.subheader("🔢 Class Probabilities:")
-            fig, ax = plt.subplots()
-            ax.bar(class_names, prediction[0] * 100, color='skyblue')
-            ax.set_ylabel('Confidence (%)')
-            ax.set_ylim([0, 100])
-            ax.set_title("Prediction Confidence for Each Class")
-            st.pyplot(fig)
-
-    except Exception as e:
-        st.error("⚠️ Error processing the image or making prediction.")
-        st.exception(e)
+    st.markdown(f"### 🧠 Prediction: `{predicted_class}`")

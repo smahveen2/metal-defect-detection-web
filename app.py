@@ -16,7 +16,7 @@ if not os.path.exists(model_path):
 # STEP 2: Load the model
 model = load_model(model_path)
 
-# STEP 3: Define class names (update with your actual defect classes)
+# STEP 3: Define class names
 class_names = ['defect_1', 'defect_2', 'no_defect']
 
 # STEP 4: Build Streamlit interface
@@ -33,11 +33,19 @@ if uploaded_file:
         st.error("Uploaded image is not in RGB format or has wrong size.")
     else:
         img_array = np.expand_dims(img_array, axis=0)
-        prediction = model.predict(img_array)
-        predicted_class = class_names[np.argmax(prediction)]
+        prediction = model.predict(img_array)[0]
+        predicted_index = np.argmax(prediction)
+        predicted_class = class_names[predicted_index]
+        confidence = prediction[predicted_index] * 100
 
         st.image(image, caption="Uploaded Image", use_column_width=True)
         st.markdown(f"### 🧠 Prediction: `{predicted_class}`")
+        st.markdown(f"**Confidence:** `{confidence:.2f}%`")
+
+        # Show full class probability table
+        st.subheader("🔢 Class Probabilities:")
+        for i, prob in enumerate(prediction):
+            st.write(f"- **{class_names[i]}**: `{prob * 100:.2f}%`")
 
 
 

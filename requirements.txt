@@ -1,0 +1,8 @@
+keras==2.10.0
+Pillow==9.5.0
+streamlit==1.16.0
+tensorflow==2.10.0  # Try version 2.10 or 2.11 if 2.12 is causing issues
+numpy==1.23.1
+matplotlib==3.5.1
+gdown==4.6.0
+h5py==3.7.0
